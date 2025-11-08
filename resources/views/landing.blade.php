@@ -133,40 +133,51 @@
                                         class="relative mb-0 overflow-hidden transition-all duration-300 ease-linear rounded-md group/gallery card hover:-translate-y-2">
                                         @php
                                             $firstImg = null;
-                                            if (isset($item->content) && preg_match('/<img.+?>/i', $item->content, $matches)) {
-                                                $firstImg = $matches[0];
+                                            if (
+                                                isset($item->content) &&
+                                            preg_match('/<img.+@endphp/i', $item->content, $matches)
+) {
+    $firstImg = $matches[0];
 
-                                                // Sanitize extracted <img> so inline width/height/style don't break layout
-                                                libxml_use_internal_errors(true);
-                                                $doc = new \DOMDocument();
-                                                // Ensure proper encoding
-                                                $doc->loadHTML(mb_convert_encoding($firstImg, 'HTML-ENTITIES', 'UTF-8'));
-                                                $imgTag = $doc->getElementsByTagName('img')->item(0);
-                                                if ($imgTag) {
-                                                    // remove width/height attributes
-                                                    $imgTag->removeAttribute('width');
-                                                    $imgTag->removeAttribute('height');
+    // Sanitize extracted <img> so inline width/height/style don't break layout
+    libxml_use_internal_errors(true);
+    $doc = new \DOMDocument();
+    // Ensure proper encoding
+    $doc->loadHTML(
+        mb_convert_encoding($firstImg, 'HTML-ENTITIES', 'UTF-8'),
+    );
+    $imgTag = $doc->getElementsByTagName('img')->item(0);
+    if ($imgTag) {
+        // remove width/height attributes
+        $imgTag->removeAttribute('width');
+        $imgTag->removeAttribute('height');
 
-                                                    // clean style attribute (remove width/height declarations)
-                                                    $style = $imgTag->getAttribute('style');
-                                                    $style = preg_replace('/(width|height)\s*:\s*[^;]+;?/i', '', $style);
-                                                    $style = trim($style);
-                                                    if ($style === '') {
-                                                        $imgTag->removeAttribute('style');
-                                                    } else {
-                                                        $imgTag->setAttribute('style', $style);
-                                                    }
+        // clean style attribute (remove width/height declarations)
+        $style = $imgTag->getAttribute('style');
+        $style = preg_replace(
+            '/(width|height)\s*:\s*[^;]+;?/i',
+            '',
+            $style,
+        );
+        $style = trim($style);
+        if ($style === '') {
+            $imgTag->removeAttribute('style');
+        } else {
+            $imgTag->setAttribute('style', $style);
+        }
 
-                                                    $firstImg = $doc->saveHTML($imgTag);
-                                                }
-                                                libxml_clear_errors();
-                                            }
-                                        @endphp
+        $firstImg = $doc->saveHTML($imgTag);
+    }
+    libxml_clear_errors();
+}
+?>
 
                                         <div class="relative overflow-hidden rounded-md group/gallery">
-                                            <div style="width:150px; height:150px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                                            <div
+                                                style="width:150px; height:150px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
                                                 @if ($firstImg)
-                                                    <div style="max-width:100%; max-height:100%; display:flex; align-items:center; justify-content:center;">
+                                                    <div
+                                                        style="max-width:100%; max-height:100%; display:flex; align-items:center; justify-content:center;">
                                                         {!! $firstImg !!}
                                                     </div>
                                                 @else
@@ -176,33 +187,40 @@
                                                 @endif
                                             </div>
 
-                                            <div class="absolute inset-0 transition-all duration-300 ease-linear opacity-0 group-hover/gallery:opacity-50 bg-gradient-to-t from-gray-900 to-transparent"></div>
-                                            <div class="absolute bottom-0 transition-all duration-300 ease-linear opacity-0 left-3 right-3 group-hover/gallery:opacity-100 group-hover/gallery:bottom-3">
-                                                <h5 class="font-normal text-white"><a href="{{ route('news.show', $item->id) }}">{{ $item->title }}</a></h5>
+                                            <div
+                                                class="absolute inset-0 transition-all duration-300 ease-linear opacity-0 group-hover/gallery:opacity-50 bg-gradient-to-t from-gray-900 to-transparent">
+                                            </div>
+                                            <div
+                                                class="absolute bottom-0 transition-all duration-300 ease-linear opacity-0 left-3 right-3 group-hover/gallery:opacity-100 group-hover/gallery:bottom-3">
+                                                <h5 class="font-normal text-white"><a
+                                                        href="{{ route('news.show', $item->id) }}">{{ $item->title }}</a>
+                                                </h5>
                                             </div>
                                         </div>
 
                                     </div>
                                 </div>
                                 <div class="grow">
-<a href="{{ route('news.show', $item->id) }}" class="text-slate-800 dark:text-zink-50 hover:text-custom-500">
-                                    @if ($item->categories)
-                                        <span
-                                            class="px-2.5 py-0.5 text-xs inline-block font-medium rounded border bg-sky-100 border-sky-200 text-sky-500 dark:bg-sky-500/20 dark:border-sky-500/20 mb-2">
-                                            {{ $item->categories->name ?? 'Tanpa Kategori' }}
-                                        </span>
-                                    @endif
-                                    <h6 class="mb-2 text-lg font-semibold">
-{{ $item->title }}
+                                    <a href="{{ route('news.show', $item->id) }}"
+                                        class="text-slate-800 dark:text-zink-50 hover:text-custom-500">
+                                        @if ($item->categories)
+                                            <span
+                                                class="px-2.5 py-0.5 text-xs inline-block font-medium rounded border bg-sky-100 border-sky-200 text-sky-500 dark:bg-sky-500/20 dark:border-sky-500/20 mb-2">
+                                                {{ $item->categories->name ?? 'Tanpa Kategori' }}
+                                            </span>
+                                        @endif
+                                        <h6 class="mb-2 text-lg font-semibold">
+                                            {{ $item->title }}
 
-                                    </h6>
-                                    <p class="text-sm text-slate-500 dark:text-zink-200 mb-2">
-                                        {{ Str::limit(strip_tags($item->content), 150, '...') }}
-                                    </p>
-                                    <p class="text-xs text-slate-400 dark:text-zink-300">
-                                        {{ $item->created_at->diffForHumans() }}
-                                    </p>
-                                </a></div>
+                                        </h6>
+                                        <p class="text-sm text-slate-500 dark:text-zink-200 mb-2">
+                                            {{ Str::limit(strip_tags($item->content), 150, '...') }}
+                                        </p>
+                                        <p class="text-xs text-slate-400 dark:text-zink-300">
+                                            {{ $item->created_at->diffForHumans() }}
+                                        </p>
+                                    </a>
+                                </div>
                             </div>
                         </div><!--end col-->
                     @endforeach
