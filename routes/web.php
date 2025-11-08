@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\AuthController;
@@ -26,4 +27,5 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 });
 
-
+Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
