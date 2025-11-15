@@ -45,7 +45,7 @@ class NewsController extends Controller
             }
             // came from site root / (landing page)
             elseif ($prevPath === '/' || Str::startsWith($previous, url('/') . '#')) {
-                $backUrl = url('/');
+                $backUrl = url('/#section-berita');
             }
             // internal other page -> allow returning there (but avoid looping to same show)
             else {
